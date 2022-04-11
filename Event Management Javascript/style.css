@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+label {
+  margin-top: 10px;
+  display: block;
+}
+input {
+  margin-top: 5px;
+}
+#add-btn {
+  display: block;
+}
+#main {
+  margin: 30px auto;
+  max-width: 400px;
+  padding: 20px;
+}
+table {
+  border-collapse: collapse;
+  text-align: center;
+}
+table td,
+table th {
+  border: solid 1px black;
+}
