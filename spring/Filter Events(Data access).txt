@@ -1,0 +1,299 @@
+
+import com.spring.dao.EventDAO;
+import com.spring.entity.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Main {
+
+	
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		Logger log = Logger.getLogger("org.hibernate");
+		log.setLevel(Level.OFF);
+		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+		ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+		BufferedReader sc = new BufferedReader(new InputStreamReader(System.in));
+		int n = 0;
+		EventDAO dao =(EventDAO) ac.getBean("eventDAO");
+		do{
+			System.out.println("Select from the list\n1) Display Hall and Events\n2) Find Events\n3) Exit");
+			n = Integer.parseInt(sc.readLine());
+			if(n==1){	
+				System.out.println("...Hall and Event List...");
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s %s\n","Id","Event Name","Organiser Name","Organiser Number", "Hall Name", "Location");
+				List<Event> events = dao.getAllEvents();
+				for(Event z : events)System.out.println(z);
+			}
+			else if(n==2){
+				System.out.println("Enter the hall name to display events");
+				String input = sc.readLine();
+				Hall hall = dao.findHallByName(input);
+				if(hall == null) System.out.println("No such hall");
+				else {	
+					List<Event> events = dao.findEventsByHallId(hall.getId());
+					for(int i=1;i<=events.size();i++)
+					System.out.println(i+") "+events.get(i-1).getEventName());
+				}
+			}
+      else if(n==3) System.out.println("Thank you");
+	  else System.out.println("Invalid Choice");
+		}while(n!=3);
+		sc.close();
+	}
+
+}
+
+
+
+*****************************************
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+    <context:annotation-config/>
+    <context:component-scan base-package="com.spring"/>
+    <context:property-placeholder location="classpath:oracle.properties"/>
+    
+    <bean id ="dataSource"  class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name ="driverClassName" value= "oracle.jdbc.OracleDriver"></property>
+    <property name ="url" value ="${db.url}" ></property>
+    <property name="username" value="${db.username}"></property>
+    <property name="password" value ="${db.password}" ></property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"> 
+    <property name="dataSource" ref="dataSource"></property>
+    </bean>
+ 
+    <bean id="eventDAO" class = "com.spring.dao.EventDAO">
+    <property name = "dataSource" ref = "dataSource"></property>
+    </bean>
+</beans>
+
+
+
+
+************************************************
+
+package com.spring.entity;
+
+public class Event {
+	
+    private int id;
+    private String eventName;
+    private String organiser;
+    private String organiserNumber;
+    private Hall hall;
+    
+    public int getId() {
+    	return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getEventName() {
+		return eventName;
+	}
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+	public String getOrganiser() {
+		return organiser;
+	}
+	public void setOrganiser(String organiser) {
+		this.organiser = organiser;
+	}
+	public String getOrganiserNumber() {
+		return organiserNumber;
+	}
+	public void setOrganiserNumber(String organiserNumber) {
+		this.organiserNumber = organiserNumber;
+	}
+	public Hall getHall() {
+		return hall;
+	}
+	public void setHall(Hall hall) {
+		this.hall = hall;
+	}
+
+	public Event() {}
+	
+	public Event(int id,String eventName,String organiser,String organiserNumber,Hall hall) {
+	   this.id = id;
+	   this.eventName = eventName;
+        this.organiser = organiser;
+        this.organiserNumber = organiserNumber;
+        this.hall = hall;
+	}
+	public String toString() {
+			return String.format("%-15s %-15s %-15s %-15s %-15s %s",id,eventName,organiser, organiserNumber, hall.getName(), hall.getLocation());
+	}
+}
+
+
+
+********************************************
+
+
+package com.spring.entity;
+
+
+public class Hall {
+
+    private int id;
+    private String name;
+    private String location;
+    
+    public int getId() {
+        return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String location) {
+		this.location = location;
+	}
+	
+
+	public Hall() {}
+	
+	public Hall(int id,String name,String location) {
+	    this.id = id;
+	    this.name = name;
+         this.location = location;
+	}
+	public String toString() {
+		return  String.format("%-15s %-15s %s\n",id, name, location);
+	}
+}
+
+
+*******************************************
+
+package com.spring.dao;
+
+import com.spring.entity.*;
+import java.sql.ResultSet;
+import java.sql.Types;
+import java.sql.SQLException;
+import java.util.*;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import javax.sql.DataSource;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
+
+@Component("eventDAO")
+public class EventDAO {
+    
+    private DataSource datasource;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    
+    public DataSource getDataSource()
+        {
+            return datasource;
+        }
+        public void setDataSource(DataSource dataSource)
+        {
+            this.jdbcTemplate= new JdbcTemplate(dataSource);
+        }
+    
+	public List<Event> getAllEvents(){
+       try{ //fill your code
+        String SQL = "select * from event e inner join hall h on e.hall_id=h.id";
+      List <Event> events = jdbcTemplate.query(SQL,new EventMapper());
+      return events;
+       }
+       catch(EmptyResultDataAccessException e){
+         return new ArrayList<Event>();
+       }
+    }
+    
+    public Hall getHallDetail(int id){
+    	try {
+		    String SQL = "select * from hall where id ="+ id;
+		    return jdbcTemplate.queryForObject(SQL,new HallMapper());
+    	}
+    	catch(EmptyResultDataAccessException e) {
+    		return null;
+    	}
+    }
+    
+    public Hall findHallByName(String name){
+		// fill your code
+    	try {
+    	  String SQL = "select * from hall where name like '"+name+"'";
+    	  Hall hall = jdbcTemplate.queryForObject(SQL,new HallMapper());
+		    return hall;
+		}
+		catch(EmptyResultDataAccessException e) {
+			return null;
+		}
+    }
+    public List<Event> findEventsByHallName(String hallname){
+        try{// fill your code
+		String SQL = "select * from event e inner join hall h on e.hall_id = h.id where h.name like '"+hallname+"'";
+		return jdbcTemplate.query(SQL,new EventMapper());
+    }
+    catch(EmptyResultDataAccessException e){
+      return null;
+    }
+    }
+    
+    public List<Event> findEventsByHallId(int hallId){
+        // fill your code
+		String SQL = "select * from event e inner join hall h on e.hall_id = h.id where h.id="+hallId;
+		return jdbcTemplate.query(SQL,new EventMapper());
+    }
+    
+}
+final class HallMapper implements RowMapper<Hall> {
+
+    public Hall mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Hall hall = new Hall();
+        hall.setId(rs.getInt("id"));
+        hall.setName(rs.getString("name"));
+        hall.setLocation(rs.getString("location"));
+        return hall;
+    }
+}
+final class EventMapper implements RowMapper<Event>{
+
+    public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Event event= new Event();
+        event.setId(rs.getInt("id"));
+        event.setEventName(rs.getString("event_name"));
+        event.setOrganiser(rs.getString("organiser"));
+        event.setOrganiserNumber(rs.getString("organiser_number"));
+        event.setHall(new Hall(rs.getInt("hall_id"),rs.getString("name"),rs.getString("location")));
+        return event;
+    }
+}

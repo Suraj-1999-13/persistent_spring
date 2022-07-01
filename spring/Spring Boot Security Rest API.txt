@@ -1,0 +1,328 @@
+package com.springboot.repository;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.springboot.domain.Product;
+import java.util.List;
+@Repository
+public interface ProductRepository extends JpaRepository<Product,Long>{
+	List<Product> findByIsAvailable(Boolean isAvailable);
+	boolean existsById(Long id);
+	
+}
+
+
+
+
+****************************
+
+
+package com.springboot.repository;
+
+
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.springboot.domain.Cart;
+import java.util.Optional;
+@Repository
+public interface CartRepository extends JpaRepository<Cart,Long>{
+  
+  Optional<Cart> findById(Long id);
+}
+
+
+
+***************************************
+
+
+
+package com.springboot.repository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.springboot.domain.User;
+@Repository
+public interface UserRepository extends JpaRepository<User,Long>{
+	
+
+	User findByUsername(String username);
+    User findByName(String name);
+	
+
+}
+
+
+*********************************
+
+package com.springboot.controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class WelcomeController {
+
+	@GetMapping("/")
+	public String welcome()
+	{
+		return "hii";
+	}
+}
+
+
+***********************************
+
+
+package com.springboot.controller;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import com.springboot.repository.ProductRepository;
+import com.springboot.domain.Product;
+
+@RestController
+public class ProductController {
+	@Autowired
+	ProductRepository pr;
+
+	@GetMapping("/product/list")
+	public List<Product> list()
+	{
+          return pr.findAll();
+	}
+    
+
+	@DeleteMapping("/product/delete/{id}")
+	public Boolean delete(@PathVariable Long id)
+	{
+           pr.deleteById(id);
+		   return true;
+	}
+	
+}
+
+
+************************************
+
+
+
+package com.springboot.controller;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.springboot.repository.CartRepository;
+import com.springboot.repository.ProductRepository;
+import com.springboot.domain.Cart;
+import com.springboot.domain.Product;
+@RestController
+public class CartController {
+    @Autowired
+	CartRepository cr;
+	@Autowired
+	ProductRepository pr;
+	
+	
+	@GetMapping("/user/showCart/{id}")
+	public Cart show(@PathVariable Long id)
+	{
+         return cr.findById(id).orElse(null);
+	}
+    
+	@GetMapping("/user/product/list")
+	public List<Product> productList()
+	{
+        return pr.findByIsAvailable(true);
+	}
+    
+	@PostMapping("/user/createCart")
+	public Cart createCart(@RequestBody Cart c)
+	{
+        return cr.save(c);
+
+	}
+    
+	@PutMapping("/user/updateCart/{id}") 
+	public Cart updateCart(@PathVariable Long id,@RequestBody Cart c)
+	{
+        Cart existingCart = cr.findById(c.getId()).orElse(null);
+    	existingCart.setProductList(c.getProductList());
+		existingCart.setPrice(c.getPrice());
+        return cr.save(existingCart);
+	}
+}
+
+
+
+**********************************************
+
+
+
+package com.springboot.service;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User.UserBuilder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.springboot.domain.User;
+import com.springboot.repository.UserRepository;
+
+
+public class UserService implements UserDetailsService {
+
+	@Autowired
+	UserRepository ur;
+	@Autowired
+	PasswordEncoder passwordencoder;
+	
+	public UserDetails loadUserByUsername(String username) {
+		User u=ur.findByUsername(username);
+		if(u==null) {
+			throw new UsernameNotFoundException("Not found");
+		}
+		return new UserDetails() {
+			
+			@Override
+			public boolean isEnabled() {
+				
+				return true;
+			}
+			
+			@Override
+			public boolean isCredentialsNonExpired() {
+			
+				return true;
+			}
+			
+			@Override
+			public boolean isAccountNonLocked() {
+				
+				return true;
+			}
+			
+			@Override
+			public boolean isAccountNonExpired() {
+			
+				return true;
+			}
+			
+			@Override
+			public String getUsername() {
+				
+				return u.getName();
+			}
+			
+			@Override
+			public String getPassword() {
+				
+				return passwordencoder.encode(u.getPassword());
+			}
+			
+			@Override
+			public Collection<? extends GrantedAuthority> getAuthorities() {
+				
+				return Collections.singleton(new SimpleGrantedAuthority(u.getRole()));
+			}
+		};
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+******************************************
+
+package com.springboot.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.springboot.service.UserService;
+
+@Configuration
+@ComponentScan({"com.springboot"})
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+	UserService userservice;
+	@Autowired
+	PasswordEncoder passwordencoder;
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+			http.httpBasic()
+	    .and()
+		.authorizeRequests()
+        .antMatchers(HttpMethod.GET,"/product/**").hasAnyAuthority("ADMIN")	
+        .anyRequest().authenticated()
+        .and()
+        .logout().permitAll()
+        .and()
+        .formLogin();
+		
+	}
+	
+	protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
+		auth.userDetailsService(userservice);
+	}
+
+	@Bean
+	public UserService userDetailsService() {
+	   return new UserService();
+	};
+	
+	@Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+	    return new BCryptPasswordEncoder();
+	};
+	
+	
+
+    
+
+}
+
+
+

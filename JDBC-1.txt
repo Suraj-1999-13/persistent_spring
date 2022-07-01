@@ -1,0 +1,575 @@
+Q-1
+
+---------------------------------
+import java.util.Date;
+import java.text.*;
+public class User {
+	Integer id;
+	String name;
+	String email;
+	String password;
+	Integer age;
+	String role;
+	Date createdDate;
+	String status;
+	
+	public User() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public User(Integer id, String name, String email, String password, Integer age, String role, Date createdDate,
+			String status) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.age = age;
+		this.role = role;
+		this.createdDate = createdDate;
+		this.status = status;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Integer getAge() {
+		return age;
+	}
+
+	public void setAge(Integer age) {
+		this.age = age;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String toString(){
+		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+		return String.format("%-15s %-15s %-15s %-15s %-15s %-15s %-15s %s",id,name,email,password,age,role,sdf.format(createdDate),status);
+	}	
+}
+
+
+
+******************************************************************
+
+
+
+import java.util.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+
+public class Main{
+    
+    public static void main(String [] args) throws Exception{
+        //fill your code here
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Before the Delete");
+        System.out.format("%-15s %-15s %-15s %-15s %-15s %-15s %-15s %s\n","Id","Name","Email","Password","Age","Role","CreatedDate","Status");
+        UserDAO udao = new UserDAO();
+		List<User> userList = udao.listUsers();
+		for(User x : userList) System.out.println(x);
+		
+        System.out.println("Enter the Id :");
+        udao.deleteUser(sc.nextInt());
+        System.out.println("After the Delete");
+		System.out.format("%-15s %-15s %-15s %-15s %-15s %-15s %-15s %s\n","Id","Name","Email","Password","Age","Role","CreatedDate","Status");
+        
+		userList = udao.listUsers();
+        for(User x : userList) System.out.println(x);
+    }
+
+}
+
+
+
+
+*************************************************************************
+
+
+
+
+import java.text.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.sql.*;
+public class UserDAO{
+
+    public ArrayList<User> listUsers() throws Exception{
+    	ArrayList<User> userList = new ArrayList<User>();
+    	//fill your code here
+      Connection con = DBConnection.getConnection();
+      Statement st = con.createStatement();
+      ResultSet rs = st.executeQuery("select * from \"user\"");
+	//   SimpleDateFormat sdf = new SimpleDateFormat("dd-MON-YYYY");
+      while(rs.next()) {
+      userList.add(new User(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getInt(5),rs.getString(6),rs.getDate(7),rs.getString(8)));
+      }
+      return userList;
+    }
+    public void deleteUser(Integer id) throws Exception{
+    	//fill your code here
+        Connection con = DBConnection.getConnection();
+      Statement st = con.createStatement();
+       int updateCount=st.executeUpdate("delete from  \"user\" where id ="+id);
+
+    }
+    
+}
+
+
+***********************************************************************
+
+
+
+import java.sql.*;
+import java.util.ResourceBundle;
+public class DBConnection {
+	public static Connection getConnection() throws ClassNotFoundException, SQLException {        
+        ResourceBundle rb = ResourceBundle.getBundle("oracle");
+        String url = rb.getString("db.url");
+        String username = rb.getString("db.username");
+        String password = rb.getString("db.password");
+        //fill your code here
+        Connection con = DriverManager.getConnection(url,username,password);
+        return con;
+    }
+}
+
+
+
+
+-----------------------------------------------------------------------
+
+Q-2
+
+------------------------------------------------------------------------
+
+public class Book {
+	Integer id;
+	String title;
+	String category;
+	String author;
+	Double price;
+	public Book() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Book(Integer id, String title, String category, String author, Double price) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.category = category;
+		this.author = author;
+		this.price = price;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	public Double getPrice() {
+		return price;
+	}
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	public String toString(){
+		return String.format("%-5s %-20s %-20s %-10s %s",id,title,category,author,price);
+	}
+}
+
+*********************************************************************
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+public class BookDAO {
+	public ArrayList<Book> listBooks() throws ClassNotFoundException, SQLException{
+    	ArrayList<Book> bookList = new ArrayList<Book>();
+    	//fill your code here
+		Connection con = DBConnection.getConnection();
+		Statement st = con.createStatement();
+		ResultSet rs = st.executeQuery("select * from Book");
+		while(rs.next()){
+			bookList.add(new Book(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5)));
+		}
+		con.close();
+		return bookList;
+    }
+}
+
+************************************************************
+
+
+import java.sql.*;
+import java.util.ResourceBundle;
+public class DBConnection {
+	public static Connection getConnection() throws ClassNotFoundException, SQLException {        
+        ResourceBundle rb = ResourceBundle.getBundle("oracle");
+        String url = rb.getString("db.url");
+        String username = rb.getString("db.username");
+        String password = rb.getString("db.password");
+        //fill your code here
+        Connection con = DriverManager.getConnection(url,username,password);
+        return con;
+   }
+}
+
+********************************************************************
+
+import java.util.*;
+public class Main {
+    public static void main(String[] args) throws Exception
+    {
+        BookDAO bd = new BookDAO(); 
+        //fill your code here
+        List<Book> books = bd.listBooks();
+        System.out.println("List of Books");
+        // System.out.println("Id       Title          Category       Author      Price");
+        System.out.format("%-5s %-20s %-20s %-10s %s\n","Id","Title","Category","Author","Price");
+        for(Book x : books)
+            System.out.println(x);
+    }
+}
+-------------------------------------------------------------
+
+Q-3
+
+------------------------------------------------------------
+
+import java.util.*;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+
+public class Main {
+    public static void main(String args[]) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Enter the name of TravelClass :");
+        String name = br.readLine();
+        System.out.println("Enter the description to update :");
+        String description = br.readLine();
+        TravelClassDAO tdao = new TravelClassDAO();
+        //fill your code here
+        tdao.updateDetail(name,description);
+        List<TravelClass> travelClassList= tdao.listAllTravelClassess();
+        System.out.println("Updated List of Travel Classes");
+        System.out.format("%-25s %s\n","Name","Description");
+        for(TravelClass t : travelClassList)
+            System.out.println(t);
+    }
+}
+
+
+***************************************************************
+
+
+public class TravelClass {
+    String name,description;
+
+    public TravelClass() {
+    }
+
+    public TravelClass(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String toString(){
+        return String.format("%-25s %s",name,description);
+    }
+}
+
+
+***********************************************************************
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TravelClassDAO {
+    ArrayList<TravelClass> listAllTravelClassess() throws ClassNotFoundException, SQLException {
+        
+        ArrayList<TravelClass> travelClassList= new ArrayList<TravelClass>();
+        Connection con = DBConnection.getConnection();
+        Statement st = con.createStatement();
+		ResultSet rs = st.executeQuery("select name,description from Travel_class order by name desc");
+		while(rs.next()){
+			travelClassList.add(new TravelClass(rs.getString(1), rs.getString(2)));
+		}
+		con.close();
+        return travelClassList;
+    }
+    public void updateDetail(String name, String description) throws ClassNotFoundException, SQLException {
+    	//fill your code here
+        Connection con = DBConnection.getConnection();
+        Statement st = con.createStatement();
+        String sql_query = "Update Travel_class set description ='"+description+"' where name = '"+name+"'";
+        int updateCount=st.executeUpdate(sql_query); 
+        con.close();
+    }
+}
+
+*************************************************************************
+
+import java.sql.*;
+import java.util.ResourceBundle;
+public class DBConnection {
+	public static Connection getConnection() throws ClassNotFoundException, SQLException {        
+
+        ResourceBundle rb = ResourceBundle.getBundle("oracle");
+        String url = rb.getString("db.url");
+        String username = rb.getString("db.username");
+        String password = rb.getString("db.password");
+        //fill your code here
+        Connection con = DriverManager.getConnection(url,username,password);
+        return con;
+    }
+}
+----------------------------------------------------------------
+
+Q-4
+
+------------------------------------------------------------------
+
+public class Airport {
+	String iataAirportCode,name,city,country;
+
+	public Airport() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Airport(String iataAirportCode, String name, String city, String country) {
+		super();
+		this.iataAirportCode = iataAirportCode;
+		this.name = name;
+		this.city = city;
+		this.country = country;
+	}
+
+	public String getIataAirportCode() {
+		return iataAirportCode;
+	}
+
+	public void setIataAirportCode(String iataAirportCode) {
+		this.iataAirportCode = iataAirportCode;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String toString(){
+		return String.format("%-10s %-40s %-10s %s",iataAirportCode,name,city,country);
+	}
+    
+    
+}
+
+*****************************************************************
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+
+public class AirportDAO {
+    public void insertAirport(Airport airportIns) throws ClassNotFoundException, SQLException{
+        Connection con = DBConnection.getConnection();
+        Statement st = con.createStatement();
+        String sql_query = "insert into Airport( iata_airport_code,name,city,country_name) values('"+airportIns.getIataAirportCode()+"','"+airportIns.getName()+"','"+airportIns.getCity()+"','"+airportIns.getCountry()+"')";
+        int updateCount=st.executeUpdate(sql_query);
+        //fill your code
+    }
+    public ArrayList<Airport> listAirport() throws ClassNotFoundException, SQLException{
+		ArrayList<Airport> airportList = new ArrayList<>();	
+        //fill your code
+	 	Connection con = DBConnection.getConnection();
+        Statement st = con.createStatement();
+		ResultSet rs = st.executeQuery("select iata_airport_code,name,city,country_name from airport");
+		while(rs.next()){
+			airportList.add(new Airport(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4)));
+		}
+		con.close();
+		return airportList;
+	}
+}
+
+***********************************************************************
+
+import java.sql.*;
+import java.util.ResourceBundle;
+public class DBConnection {
+	public static Connection getConnection() throws ClassNotFoundException, SQLException {          
+        ResourceBundle rb = ResourceBundle.getBundle("oracle");
+        String url = rb.getString("db.url");
+        String user = rb.getString("db.username");
+        String pass = rb.getString("db.password");
+        Connection con = DriverManager.getConnection(url,user,pass);
+        return con;
+    }
+}
+
+
+**************************************************************
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.*;
+public class Main {
+    public static void main(String args[]) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String countryName,airportCode,airportName,city;
+        System.out.println("Enter the Airport Code :");
+        airportCode = br.readLine();
+        System.out.println("Enter the Airport name :");
+        airportName = br.readLine();
+        System.out.println("Enter the City :");
+        city = br.readLine();
+	    System.out.println("Enter the Country name :");
+        countryName = br.readLine();
+        AirportDAO adao = new AirportDAO();
+        adao.insertAirport(new Airport(airportCode,airportName,city,countryName));
+        //fill your code
+        List<Airport> airportList = adao.listAirport();
+        System.out.format("%-10s %-40s %-10s %s\n","IATA Code","Name","City","Country");
+        for(Airport x : airportList) System.out.println(x);
+    }
+}
+
+
+
+--------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

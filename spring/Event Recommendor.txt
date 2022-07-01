@@ -1,0 +1,126 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN"
+        "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<beans>
+<bean id="event1" class="com.spring.Event">
+<property name="eventName" value="Magic Show"></property>
+<property name="eventOrganiser" value="Vadivel"></property>
+<property name="fare" value="650"></property>
+</bean>
+<bean id="event3" class="com.spring.Event">
+<property name="eventName" value="Standup Comedy"></property>
+<property name="eventOrganiser" value="Arun"></property>
+<property name="fare" value="500"></property>
+</bean>
+<bean id="event2" class="com.spring.Event">
+<property name="eventName" value="Puppet Show"></property>
+<property name="eventOrganiser" value="Maggie"></property>
+<property name="fare" value="250"></property>
+</bean>
+</beans>
+
+
+*************************************
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.springframework.beans.factory.BeanFactory;
+//import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
+import com.spring.Event;
+import com.spring.EventList;
+import java.util.Scanner;
+public class Main {
+
+	public static void main(String[] args) {
+		Logger log = Logger.getLogger("org.hibernate");
+		log.setLevel(Level.OFF);
+		System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+		Scanner sc=new Scanner(System.in);
+		ApplicationContext app=new ClassPathXmlApplicationContext("applicationContext.xml");
+		Event e1=(Event)app.getBean("event1");
+		Event e2=(Event)app.getBean("event2");
+		Event e3=(Event)app.getBean("event3");
+		EventList list=new EventList();
+		list.insert(e1);
+		list.insert(e2);
+		list.insert(e3);
+		System.out.println("Enter your Budget");
+		double b=sc.nextDouble();
+		list.recommendfor(b);
+	}
+
+}
+
+****************************************************
+
+package com.spring;
+
+public class Event {
+	String eventName;
+	String eventOrganiser;
+	Double fare;
+	public String getEventName() {
+		return eventName;
+	}
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+	public String getEventOrganiser() {
+		return eventOrganiser;
+	}
+	public void setEventOrganiser(String eventOrganiser) {
+		this.eventOrganiser = eventOrganiser;
+	}
+	public Double getFare() {
+		return fare;
+	}
+	public void setFare(Double fare) {
+		this.fare = fare;
+	}
+	public void display() {
+		//Fill your code here
+	}
+}
+
+
+*****************************************
+
+package com.spring;
+
+import java.util.ArrayList;
+
+public class EventList {
+
+	ArrayList<Event> eventMenu = new ArrayList<Event>();
+
+	public void insert(Event event) {
+		eventMenu.add(event);
+	}
+
+	public void recommendfor(Double budget) {
+		ArrayList<String> Menu = new ArrayList<String>();
+		for (int i = 0; i < eventMenu.size(); i++) {
+			int no = (int) (budget / (eventMenu.get(i).getFare()));
+			if (no > 0)
+				Menu.add(eventMenu.get(i).getEventName() + "-" + no);
+		}
+		if (Menu.size() == 0)
+			System.out.println("No Shows available");
+		else {
+			for (int i = 0; i < Menu.size(); i++) {
+				System.out.println(Menu.get(i));
+			}
+
+		}
+	}
+
+
+}
