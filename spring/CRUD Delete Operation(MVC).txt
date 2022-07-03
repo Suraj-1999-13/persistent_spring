@@ -1,0 +1,426 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>   
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1" isELIgnored="false"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Event Weekend</title>
+<style type="text/css">
+#grad1 {
+	height: 50%;
+        background: lightsteelblue;
+	background: linear-gradient(lightsteelblue, lightskyblue);
+}
+
+body {
+        background: #f7f9fc;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
+}
+
+.header {
+	background-color: lightsteelblue;
+	width: 100%;
+}
+
+.footer {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 5%;
+	text-align: center;
+}
+
+#content {
+	position: absolute;
+	top: 220px;
+	left: 150px;
+	text-align: center;
+}
+
+p {
+	margin-left: 20px;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter', monospace;
+	font-size: 16px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 26.4px;
+}
+
+.boxed {
+	width: 500px;
+	padding: 10px;
+	border: 2px solid black;
+	margin: 10px;
+	text-align: center;
+	background-color: lightblue;
+}
+
+.p1 {
+	color: white;
+}
+#data{
+   
+     padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+	<div class="header">
+		<table>
+			<tr>
+				<td><img
+					src="${pageContext.request.contextPath}/resources/images/abcevents.png"
+					height="120" width="150" style="float: left";></td>
+				<td><span style="vertical-align: middle">
+						<h1
+							style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+							Enriching Entertainment
+							</h3>
+				</span></td>
+			</tr>
+		</table>
+		
+	</div>
+	
+	<div id="data">
+		<h2>Hall Details</h2>
+		<table border="2" id="tableDetails">
+			<tr>
+				<th align="center">Hall id</th>
+				<th align="center">Hall Name</th>
+				<th align="center">Hall Owner Name</th>
+				<th align="center">Owner Contact</th>
+				<th align="center">Owner email</th>
+				<th align="center">Cost per Day</th>
+			</tr>
+	<c:forEach items="${tableDetails }" var="tuple">
+	<tr>
+	    	    <td align="center">${tuple.id}</th>
+				<td align="center">${tuple.hallName}</th>
+				<td align="center">${tuple.hallOwnerName}</th>
+				<td align="center">${tuple.ownerMobile}</th>
+				<td align="center">${tuple.ownerEmailId}</th>
+				<td align="center">${tuple.hallFare}</th>
+	</tr>
+	</c:forEach>
+		</table>
+		<form id="form1" action="deleteHallProcess" method="POST">
+                    <table id="formTable" style="padding-top:20px;">
+                        <tr>
+                            <td>Name</td>
+                            <td><input type="text" name="name"/></td>
+                            
+                        </tr>
+                        <tr>
+                            <td colspan="2"><button>View Changes</button> </td>
+                        </tr>
+                    </table>
+		
+		</form>
+	</div>
+</body>
+</html>
+
+
+
+*******************************************************
+
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>   
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1" isELIgnored="false"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+ 
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Event Weekend</title>
+<style type="text/css">
+#grad1 {
+	height: 50%;
+        background: lightsteelblue;
+	background: linear-gradient(lightsteelblue, lightskyblue);
+}
+
+body {
+        background: #f7f9fc;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
+}
+
+.header {
+	background-color: lightsteelblue;
+	width: 100%;
+}
+
+.footer {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 5%;
+	text-align: center;
+}
+
+#content {
+	position: absolute;
+	top: 220px;
+	left: 150px;
+	text-align: center;
+}
+
+p {
+	margin-left: 20px;
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter',
+		'Lucida Typewriter', monospace;
+	font-size: 16px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 26.4px;
+}
+
+.boxed {
+	width: 500px;
+	padding: 10px;
+	border: 2px solid black;
+	margin: 10px;
+	text-align: center;
+	background-color: lightblue;
+}
+
+.p1 {
+	color: white;
+}
+#data{
+   
+    padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+	<div class="header">
+		<table>
+			<tr>
+				<td><img
+					src="${pageContext.request.contextPath}/resources/images/abcevents.png"
+					height="120" width="150" style="float: left";></td>
+				<td><span style="vertical-align: middle">
+						<h1
+							style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+							Enriching Entertainment
+							</h3>
+				</span></td>
+			</tr>
+		</table>
+		
+	</div>
+	<form action="deleteHall">
+	<div id="data">
+		<h2>Hall Details</h2>
+		<table id="tableDetails" border="2">
+			<tr>
+				<th align="center">Hall id</th>
+				<th align="center">Hall Name</th>
+				<th align="center">Hall Owner Name</th>
+				<th align="center">Owner Contact</th>
+				<th align="center">Owner email</th>
+				<th align="center">Cost per Day</th>
+			</tr>
+		<c:forEach items="${tableDetails }" var="tuple">
+	<tr>
+	    	    <td align="center">${tuple.id}</th>
+				<td align="center">${tuple.hallName}</th>
+				<td align="center">${tuple.hallOwnerName}</th>
+				<td align="center">${tuple.ownerMobile}</th>
+				<td align="center">${tuple.ownerEmailId}</th>
+				<td align="center">${tuple.hallFare}</th>
+	</tr>
+	</c:forEach>
+	
+		</table>
+		<a ><button>Change Email</button></a>&nbsp&nbsp<a ><button>Delete Hall</button></a>&nbsp&nbsp<a ><button>Insert</button></a>
+	
+	</div>
+	</form>
+</body>
+</html>
+
+
+
+*****************************************************
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config></context:annotation-config>
+    <context:component-scan base-package="com.spring"></context:component-scan>
+    <context:property-placeholder location="classpath:oracle.properties"/>
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name = "driverClassName" value = "oracle.jdbc.OracleDriver"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+    </bean>
+    
+    <bean id="viewResolver"
+              class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/views/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+<bean id="jt" class="org.springframework.jdbc.core.JdbcTemplate">    
+<property name="dataSource" ref="dataSource"></property>    
+</bean>    
+    
+<bean id="dao" class="com.spring.HallDAO">    
+<property name="template" ref="jt"></property>    
+</bean>       
+</beans> 
+
+
+*****************************************************
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="2.4">
+  <display-name>Crud_Delete</display-name>
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>
+
+
+**********************************************
+
+package com.spring;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class HallDAO { 
+	
+	
+	JdbcTemplate Template;
+	
+    public void setTemplate(JdbcTemplate template) {    
+ 		this.Template = template;    
+     } 
+
+	public List<Hall> getAllHalls(){
+
+     return Template.query("select * from hall",new RowMapper<Hall>(){    
+     public Hall mapRow(ResultSet rs, int row) throws SQLException {    
+     Hall e=new Hall();    
+     e.setId(rs.getInt(1));    
+     e.setHallName(rs.getString(2));    
+     e.setHallOwnerName(rs.getString(3));    
+     e.setOwnerEmailId(rs.getString(4)); 
+     e.setHallFare(rs.getInt(5));
+     e.setOwnerMobile(rs.getString(6));           
+     return e;    
+     }    
+ });   
+		
+	}
+	
+	public int delete(String name) {
+     String sql="delete from hall where hallName= ?";    
+     return Template.update(sql,name); 
+	}
+
+}
+
+
+
+**********************************************
+
+package com.spring;
+
+
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+public class HomeController {
+
+	   @Autowired
+		HallDAO dao;
+		
+		@RequestMapping("/")
+		public ModelAndView Home() {
+	         ModelAndView mv=new ModelAndView();
+	         List<Hall> h= dao.getAllHalls();
+	         mv.addObject("tableDetails",h);
+	         mv.setViewName("Home");
+	         return mv;
+			
+		}
+
+		@RequestMapping("/deleteHall")
+		public ModelAndView delete(){
+			   ModelAndView mv=new ModelAndView();
+		         List<Hall> h= dao.getAllHalls();
+		         mv.addObject("tableDetails",h);
+		         mv.setViewName("Delete");
+		         return mv;
+			
+		}
+
+		@RequestMapping(value="/deleteHallProcess", method=RequestMethod.POST)
+		public ModelAndView deleteHallProcess(@RequestParam("name") String name){
+			 ModelAndView mv=new ModelAndView();
+			 dao.delete(name);
+			 List<Hall> h= dao.getAllHalls();
+	         mv.addObject("tableDetails",h);
+	         mv.setViewName("Home");
+	         return mv;
+		
+		}
+}
+
+
+
+
